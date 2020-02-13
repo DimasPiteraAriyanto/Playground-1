@@ -1,0 +1,141 @@
+git-push (1) Halaman Manual
+NAMA
+git-push - Perbarui referensi jarak jauh bersama dengan objek terkait
+
+RINGKASAN
+git push [--all | --mirror | --tags] [--follow-tag] [--atomic] [-n | --dry-run] [--receive-pack = <git-receive-pack>]
+[--repo = <repositori>] [-f | --force] [-d | --delete] [--prune] [-v | --verbose]
+[-u | --set-upstream]
+[- [tidak-] ditandatangani | --sign = (true | false | if-ask)]
+[- Angkatan-dengan-sewa [= <refname> [: <expect>]]]
+[--tidak memverifikasi] [<lokasi> [<refspec> ...]]
+DESKRIPSI
+Memperbarui referensi jarak jauh menggunakan referensi lokal, sambil mengirim objek yang diperlukan untuk menyelesaikan referensi yang diberikan.
+
+Anda dapat membuat hal-hal menarik terjadi pada repositori setiap kali Anda mendorongnya, dengan menyiapkan kait di sana. Lihat dokumentasi untuk git-accept-pack (1).
+
+Ketika baris perintah tidak menentukan di mana harus mendorong dengan argumen <repositori>, cabang. *. Konfigurasi jauh untuk cabang saat ini dikonsultasikan untuk menentukan di mana harus mendorong. Jika konfigurasi tidak ada, default ke asal.
+
+Ketika baris perintah tidak menentukan apa yang harus didorong dengan argumen <refspec> ... atau --all, --mirror, --tags, perintah tersebut menemukan default <refspec> dengan berkonsultasi dengan konfigurasi push. *. Push jarak jauh, dan jika tidak ditemukan, hormati konfigurasi push.default untuk memutuskan apa yang harus ditekan (Lihat git-config (1) untuk arti push.default).
+
+Ketika baris perintah atau konfigurasi tidak menentukan apa yang harus ditekan, perilaku default digunakan, yang sesuai dengan nilai sederhana untuk push.default: cabang saat ini didorong ke cabang hulu yang sesuai, tetapi sebagai tindakan pengamanan, dorongan dibatalkan jika cabang hulu tidak memiliki nama yang sama dengan cabang lokal.
+
+PILIHAN
+<repositori>
+Repositori "jarak jauh" yang merupakan tujuan operasi push. Parameter ini dapat berupa URL (lihat bagian GIT URL di bawah) atau nama jarak jauh (lihat bagian REMOTES di bawah).
+
+<refspec> ...
+Tentukan tujuan ref yang akan diperbarui dengan objek sumber apa. Format parameter <refspec> adalah opsional plus +, diikuti oleh objek sumber <src>, diikuti oleh titik dua:, diikuti oleh tujuan ref <dst>.
+
+<src> sering merupakan nama cabang yang ingin Anda dorong, tetapi bisa berupa sembarang "ekspresi SHA-1", seperti master ~ 4 atau HEAD (lihat gitrevisions (7)).
+
+<dst> memberi tahu referensi mana pada sisi jarak jauh yang diperbarui dengan dorongan ini. Ekspresi sewenang-wenang tidak dapat digunakan di sini, referensi yang sebenarnya harus dinamai. Jika git push [<repository>] tanpa argumen <refspec> diatur untuk memperbarui beberapa referensi di tujuan dengan <src> dengan remote. <repository> .push variabel konfigurasi,: bagian <dst> dapat dihilangkan — seperti itu push akan memperbarui referensi yang <src> biasanya diperbarui tanpa <refspec> apa pun di baris perintah. Jika tidak, tidak ada: <dst> berarti memperbarui referensi yang sama dengan <src>.
+
+Objek yang dirujuk oleh <src> digunakan untuk memperbarui referensi <dst> di sisi jarak jauh. Secara default ini hanya diperbolehkan jika <dst> bukan tag (beranotasi atau ringan), dan hanya jika itu dapat memajukan <dst> dengan cepat. Dengan memiliki + opsional opsional, Anda dapat memberitahu Git untuk memperbarui ref <dst> bahkan jika itu tidak diizinkan secara default (misalnya, itu bukan fast-forward.) Ini tidak berusaha untuk menggabungkan <src> menjadi <dst >. Lihat CONTOH di bawah untuk detailnya.
+
+tag <tag> artinya sama dengan ref / tag / <tag>: refs / tag / <tag>.
+
+Menekan <src> kosong memungkinkan Anda untuk menghapus ref <dst> dari repositori jarak jauh.
+
+Refspec khusus: (atau +: untuk memungkinkan pembaruan non-maju) mengarahkan Git untuk mendorong cabang "cocok": untuk setiap cabang yang ada di sisi lokal, sisi jarak jauh diperbarui jika cabang dengan nama yang sama sudah ada di sisi yang jauh.
+
+--semua
+Dorong semua cabang (mis. Referensi di bawah referensi / kepala /); tidak dapat digunakan dengan <refspec> lainnya.
+
+--memangkas
+Hapus cabang jarak jauh yang tidak memiliki rekanan lokal. Misalnya cabang jarak jauh tmp akan dihapus jika cabang lokal dengan nama yang sama tidak ada lagi. Ini juga menghormati refspec, mis. git push --proune remote ref / head / *: refs / tmp / * akan memastikan bahwa ref / tmp / foo jarak jauh akan dihapus jika ref / head / foo tidak ada.
+
+--cermin
+Alih-alih memberi nama setiap ref untuk mendorong, tentukan bahwa semua ref di bawah ref / (yang termasuk tetapi tidak terbatas pada ref / head /, ref / remote /, dan ref / tag /) dicerminkan ke repositori jarak jauh. Referensi lokal yang baru dibuat akan didorong ke ujung jarak jauh, referensi yang diperbarui secara lokal akan diperbarui secara paksa di ujung jarak jauh, dan referensi yang dihapus akan dihapus dari ujung jarak jauh. Ini adalah default jika opsi konfigurasi jarak jauh. <remote> .mirror diatur.
+
+-n
+--jalankan-lari
+Lakukan segalanya kecuali mengirim pembaruan.
+
+--porselen
+Menghasilkan keluaran yang bisa dibaca mesin. Baris status output untuk setiap ref akan dipisahkan oleh tab dan dikirim ke stdout alih-alih stderr. Nama simbolis lengkap dari referensi akan diberikan.
+
+--menghapus
+Semua referensi yang tercantum dihapus dari repositori jarak jauh. Ini sama dengan awalan semua referensi dengan titik dua.
+
+--tags
+Semua ref di bawah ref / tag didorong, di samping refspec yang secara eksplisit tercantum di baris perintah.
+
+--follow-tag
+Dorong semua referensi yang akan didorong tanpa opsi ini, dan dorong juga tag beranotasi dalam referensi / tag yang hilang dari jarak jauh tetapi arahkan pada komit yang dapat dijangkau dari referensi yang didorong. Ini juga dapat ditentukan dengan variabel konfigurasi push.followTags. Untuk informasi lebih lanjut, lihat push.followTags di git-config (1).
+
+- [tidak-] ditandatangani
+--sign = (true | false | if-ask)
+GPG-tandatangani permintaan push untuk memperbarui referensi di sisi penerima, untuk memungkinkannya diperiksa oleh kait dan / atau dicatat. Jika salah atau --tidak ditandatangani, tidak ada penandatanganan yang akan dilakukan. Jika benar atau --ditandatangani, push akan gagal jika server tidak mendukung push yang ditandatangani. Jika diatur ke jika diminta, tandatangani jika dan hanya jika server mendukung push yang ditandatangani. Dorongan juga akan gagal jika panggilan sebenarnya ke gpg --sign gagal. Lihat git-accept-pack (1) untuk detailnya di sisi penerima.
+
+- [tidak-] atom
+Gunakan transaksi atom di sisi jarak jauh jika tersedia. Entah semua referensi diperbarui, atau karena kesalahan, tidak ada referensi diperbarui. Jika server tidak mendukung dorongan atom, push akan gagal.
+
+--receive-pack = <git-receive-pack>
+--exec = <git-receive-pack>
+Jalan ke program git-accept-pack di ujung jarak jauh. Terkadang berguna ketika mendorong ke repositori jarak jauh melalui ssh, dan Anda tidak memiliki program di direktori pada $ PATH default.
+
+- [tanpa-] paksa-dengan-sewa
+--force-with-lease = <refname>
+--force-with-lease = <refname>: <expect>
+Biasanya, "git push" menolak untuk memperbarui referensi jarak jauh yang bukan merupakan nenek moyang dari referensi lokal yang digunakan untuk menimpanya.
+
+Opsi ini mengesampingkan pembatasan ini jika nilai saat ini dari referensi jarak jauh adalah nilai yang diharapkan. "git push" gagal jika tidak.
+
+Bayangkan Anda harus menyusun ulang apa yang sudah Anda terbitkan. Anda harus melewati aturan "harus maju" untuk mengganti riwayat yang semula Anda terbitkan dengan riwayat rebased. Jika orang lain membangun di atas sejarah asli Anda saat Anda rebasing, ujung cabang di remote mungkin maju dengan komitnya, dan mendorong secara buta dengan --force akan kehilangan pekerjaannya.
+
+Opsi ini memungkinkan Anda untuk mengatakan bahwa Anda mengharapkan riwayat yang Anda perbarui adalah apa yang Anda rebase dan ingin ganti. Jika referensi jarak jauh masih menunjuk komit yang Anda tentukan, Anda dapat yakin bahwa tidak ada orang lain yang melakukan sesuatu terhadap referensi tersebut. Ini seperti mengambil "sewa" pada ref tanpa menguncinya secara eksplisit, dan remote ref diperbarui hanya jika "leasing" masih valid.
+
+--force-with-lease saja, tanpa menentukan detailnya, akan melindungi semua referensi jarak jauh yang akan diperbarui dengan mewajibkan nilainya saat ini sama dengan cabang pelacakan jarak jauh yang kami miliki untuk mereka.
+
+--force-with-lease = <refname>, tanpa menentukan nilai yang diharapkan, akan melindungi ref yang disebutkan (sendiri), jika akan diperbarui, dengan mengharuskan nilainya saat ini sama dengan cabang pelacakan jarak jauh kami punya untuk itu.
+
+--force-with-lease = <refname>: <expect> akan melindungi ref yang bernama (sendiri), jika akan diperbarui, dengan mengharuskan nilainya saat ini sama dengan nilai yang ditentukan <expect> (yang diizinkan untuk berbeda dari cabang pelacakan jarak jauh yang kami miliki untuk refname, atau kami bahkan tidak harus memiliki cabang pelacakan jarak jauh saat formulir ini digunakan).
+
+Perhatikan bahwa semua bentuk selain - force-with-lease = <refname>: <expect> yang menentukan nilai saat ini yang diharapkan dari referensi secara eksplisit masih eksperimental dan semantik mereka dapat berubah saat kami mendapatkan pengalaman dengan fitur ini.
+
+"--no-force-with-lease" akan membatalkan semua --force-with-leasing sebelumnya di baris perintah.
+
+-f
+--memaksa
+Biasanya, perintah tersebut menolak untuk memperbarui referensi jarak jauh yang bukan merupakan nenek moyang dari referensi lokal yang digunakan untuk menimpanya. Juga, ketika opsi --force-with-lease digunakan, perintah menolak untuk memperbarui referensi jarak jauh yang nilainya saat ini tidak sesuai dengan yang diharapkan.
+
+Bendera ini menonaktifkan pemeriksaan ini, dan dapat menyebabkan repositori jarak jauh kehilangan komit; gunakan dengan hati-hati.
+
+Perhatikan bahwa --force berlaku untuk semua referensi yang didorong, karenanya menggunakannya dengan push.default yang disetel untuk mencocokkan atau dengan beberapa tujuan push yang dikonfigurasikan dengan remote. *. Push mungkin menimpa referensi selain cabang saat ini (termasuk referensi lokal yang di belakang rekan jauh mereka). Untuk memaksakan dorongan hanya ke satu cabang, gunakan tanda + di depan refspec untuk mendorong (mis. Git push asal + master untuk memaksa dorongan ke cabang master). Lihat bagian <refspec> ... di atas untuk detailnya.
+
+--repo = <repositori>
+Opsi ini setara dengan argumen <repositori>. Jika keduanya ditentukan, argumen baris perintah diutamakan.
+
+-u
+--set-hulu
+Untuk setiap cabang yang diperbarui atau berhasil didorong, tambahkan referensi upstream (pelacakan), digunakan oleh argumen-less git-pull (1) dan perintah lainnya. Untuk informasi lebih lanjut, lihat cabang. <name> .merge di git-config (1).
+
+--[tidak ada
+Opsi-opsi ini diteruskan ke git-send-pack (1). Transfer tipis secara signifikan mengurangi jumlah data yang dikirim ketika pengirim dan penerima berbagi banyak objek yang sama. Standarnya adalah \ - tipis.
+
+-q
+--diam
+Menekan semua output, termasuk daftar referensi yang diperbarui, kecuali terjadi kesalahan. Kemajuan tidak dilaporkan ke aliran kesalahan standar.
+
+-v
+--verbose
+Jalankan secara lisan.
+
+--kemajuan
+Status progres dilaporkan pada stream kesalahan standar secara default ketika dilampirkan ke terminal, kecuali -q ditentukan. Bendera ini memaksa status kemajuan bahkan jika aliran kesalahan standar tidak diarahkan ke terminal.
+
+--no-recurse-submodules
+--recurse-submodules = check | on-demand | no
+Dapat digunakan untuk memastikan semua komitmen submodule yang digunakan oleh revisi yang akan didorong tersedia di cabang pelacak jarak jauh. Jika cek digunakan, Git akan memverifikasi bahwa semua submodule melakukan perubahan pada revisi yang akan didorong tersedia pada setidaknya satu remote submodule. Jika ada komit yang hilang, push akan dibatalkan dan keluar dengan status tidak nol. Jika sesuai permintaan digunakan, semua submodula yang diubah dalam revisi yang akan didorong akan didorong. Jika sesuai permintaan tidak dapat mendorong semua revisi yang diperlukan, maka itu juga akan dibatalkan dan keluar dengan status tidak nol. Nilai tidak atau menggunakan --no-recurse-submodules dapat digunakan untuk mengganti variabel konfigurasi push.recurseSubmodules ketika tidak diperlukan rekursi submodule.
+
+- [tidak-] verifikasi
+Alihkan kait pra-tekan (lihat githooks (5)). Standarnya adalah --verify, memberi peluang kait untuk mencegah dorongan. Dengan --tidak memverifikasi, kait dilewati sepenuhnya.
+
+-4
+--ipv4
+Gunakan alamat IPv4 saja, abaikan alamat IPv6.
+
+-6
+--ipv6
+Gunakan alamat IPv6 saja, abaikan alamat IPv4.
